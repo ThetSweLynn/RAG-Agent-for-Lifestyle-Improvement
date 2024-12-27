@@ -1,7 +1,10 @@
 name: rag_flutter_app
 description: "A new Flutter project."
+
+# Prevent this package from being published to pub.dev
 publish_to: 'none'
 
+# The current version of the app
 version: 1.0.0+1
 
 environment:
@@ -10,19 +13,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.2.2
-  cupertino_icons: ^1.0.8
-  flutter_sound: ^9.2.13+1
-  permission_handler: ^10.3.0
+  http: ^1.2.2               # For HTTP requests
+  cupertino_icons: ^1.0.8    # iOS-styled icons
+  flutter_sound: ^9.2.13     # Audio recording and playback
+  permission_handler: ^10.4.5 # For managing app permissions
 
 dev_dependencies:
   flutter_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
+    sdk: flutter             # For testing
+  flutter_lints: ^5.0.0      # Linting rules for Flutter
 
 flutter:
-  uses-material-design: true
+  uses-material-design: true # Use Material Design widgets
 
-  # Add the assets section
+  # Declare assets used in the app
   assets:
-    - assets/logo.png
+    - assets/logo.png        # Ensure this file exists in the assets folder

@@ -9,31 +9,43 @@ class VoiceChatScreen extends StatefulWidget {
 }
 
 class _VoiceChatScreenState extends State<VoiceChatScreen> {
-  final VoiceChatHelper _voiceChatHelper = VoiceChatHelper();
+  final VoiceChatHelper _voiceChatHelper = VoiceChatHelper(baseUrl: 'https://your-api-base-url.com');
   String? _response = "Press and hold the button to speak.";
   bool _isRecording = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeRecorder();
+    _initializeVoiceChat();
   }
 
-  // Initialize the recorder
-  Future<void> _initializeRecorder() async {
+  // Initialize voice chat with mock permissions
+  Future<void> _initializeVoiceChat() async {
     try {
-      await _voiceChatHelper.initRecorder();
+      await _voiceChatHelper.initRecorder(mock: true); // Enable mock mode
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _response = "Error initializing recorder: $e";
-      });
+      if (mounted) {
+        setState(() {
+          _response = "Error initializing voice chat: $e";
+        });
+      }
     }
   }
 
   // Handle recording start
   void _startRecording() async {
+    if (!_isInitialized) {
+      await _initializeVoiceChat();
+    }
+
     try {
-      await _voiceChatHelper.startRecording();
+      await _voiceChatHelper.startRecording(mock: true); // Enable mock mode
       setState(() {
         _isRecording = true;
         _response = "Listening...";
@@ -48,13 +60,14 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
   // Handle recording stop and send the audio
   void _stopRecording() async {
     try {
-      final response = await _voiceChatHelper.stopRecordingAndSend();
+      final response = await _voiceChatHelper.stopRecordingAndSend(mock: true); // Enable mock mode
       setState(() {
         _isRecording = false;
         _response = response ?? "No response received.";
       });
     } catch (e) {
       setState(() {
+        _isRecording = false;
         _response = "Error stopping recording: $e";
       });
     }
@@ -69,23 +82,26 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Voice Chat")),
+      appBar: AppBar(title: const Text("Voice Chat")),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              _response ?? "",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                _response ?? "",
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             GestureDetector(
               onLongPress: _startRecording,
               onLongPressUp: _stopRecording,
               child: CircleAvatar(
                 radius: 40,
-                backgroundColor: _isRecording ? Colors.red : Colors.blue,
+                backgroundColor: _isRecording ? Colors.red : const Color(0xFF008080),
                 child: Icon(
                   _isRecording ? Icons.mic : Icons.mic_none,
                   color: Colors.white,
