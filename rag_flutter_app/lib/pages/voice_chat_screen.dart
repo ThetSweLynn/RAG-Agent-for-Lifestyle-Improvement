@@ -100,13 +100,13 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
               onLongPress: _startRecording,
               onLongPressUp: _stopRecording,
               child: CircleAvatar(
-                radius: 40,
-                backgroundColor: _isRecording ? Colors.red : const Color(0xFF008080),
-                child: Icon(
-                  _isRecording ? Icons.mic : Icons.mic_none,
-                  color: Colors.white,
-                  size: 40,
-                ),
+                radius: 60,
+                backgroundColor: _isRecording ? Colors.red : const Color(0xFF66B2B2),
+                child: Image.asset(
+                    'assets/voice_chat.png',
+                    width: 60, // Adjust the width to fit your design
+                    height: 60, // Adjust the height to fit your design
+                  ),
               ),
             ),
           ],

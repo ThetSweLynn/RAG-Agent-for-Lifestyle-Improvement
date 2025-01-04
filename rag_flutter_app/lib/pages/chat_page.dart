@@ -92,7 +92,11 @@ class _ChatPageState extends State<ChatPage> {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.mic_none, color: Colors.redAccent),
+                  icon: Image.asset(
+                    'assets/voice_chat.png',
+                    width: 30, // Adjust the width to fit your design
+                    height: 30, // Adjust the height to fit your design
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -100,6 +104,7 @@ class _ChatPageState extends State<ChatPage> {
                     );
                   },
                 ),
+                const SizedBox(width: 8), // Add more spacing before text field
                 Expanded(
                   child: TextField(
                     controller: _controller,
@@ -113,7 +118,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 30), // Add more spacing before send button
+                const SizedBox(width: 20), // Add more spacing before send button
                 CircleAvatar(
                   backgroundColor: const Color(0xFF008080),
                   radius: 24, // Optional: Adjust size of the send button for prominence

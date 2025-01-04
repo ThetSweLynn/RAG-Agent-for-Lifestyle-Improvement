@@ -28,4 +28,5 @@ flutter:
 
   # Declare assets used in the app
   assets:
-    - assets/logo.png        # Ensure this file exists in the assets folder
+    - assets/logo.png
+    - assets/voice_chat.png
