@@ -8,4 +8,4 @@ ___
 * Step-2: Run the flutter app using "flutter run" in the rag_flutter_app folder
 
 > Voice chat not available yet in the flutter app
-> You can test the voice chat in the nutrition_rag.py file from "vikhadr" branch
+> You can test the voice chat in the nutrition_rag.py file from "ECTI-DAMT-and-NCON-2025" branch
