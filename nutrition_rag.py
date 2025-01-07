@@ -156,7 +156,8 @@ def call_rag_agent(query):
 # Text-to-Speech Function
 def speak_text(text):
     try:
-        cleaned_text = text.replace('\n', ' ').strip()
+        cleaned_text = text.split("\n\nSources:")[0].replace('\n', ' ').strip()
+
         if len(cleaned_text) > 200:
             chunks = [cleaned_text[i:i+200] for i in range(0, len(cleaned_text), 200)]
             for chunk in chunks:
@@ -217,12 +218,17 @@ def main():
             if query:
                 print(f"You: {query}")
                 append2log(f"You: {query}")
-
                 response = call_rag_agent(query)
                 print(f"AI: {response}")
+                speak_text(response.replace("*", ""))
                 append2log(f"AI: {response}")
             else:
                 print("Sorry, I didn't catch that. Please try again.")
+            # Check for exit keywords
+            if query.lower() in ["that's all", "bye", "goodbye", "exit"]:
+                print("Exiting... Goodbye!")
+                append2log("Exiting... Goodbye!")
+                break
                 
     elif choice == "2":
         while True:
