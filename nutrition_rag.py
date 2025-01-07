@@ -13,6 +13,25 @@ from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import RetrievalQA
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# Initialize Firebase
+cred = credentials.Certificate("serviceAccountKey.json")  # Download this file from Firebase Console
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+#Get user biometric data from Firestore
+def get_user_biometric_data(user_id):
+    try:
+        user_doc = db.collection('users').document(user_id).get()
+        if user_doc.exists:
+            return user_doc.to_dict()  # Returns a dictionary of biometric data
+        else:
+            return None
+    except Exception as e:
+        print(f"Error fetching user data: {e}")
+        return None
 
 # Initialize mixer for text-to-speech
 mixer.init()
@@ -112,7 +131,9 @@ def process_llm_response(llm_response):
 
 # RAG Agent Function
 # New Method: Answer Questions Without Sources
-def call_rag_agent(query):
+def call_rag_agent(query, userId="user001"):  #Change userId to the actual user ID
+    
+    #Get knowledge base
     try:
         retrieved_docs = retriever.invoke(query)
     except Exception as e:
@@ -130,6 +151,7 @@ def call_rag_agent(query):
     else:
         context_info = "No relevant information found in Nutrition Data PDFs.\n"
 
+    #Get conversation history
     conversation_history = memory.get_history()
 
     custom_prompt = (
@@ -138,10 +160,28 @@ def call_rag_agent(query):
         "Keep the answers brief, with a maximum of 6 lines. "
         "Avoid speculative statements."
     )
+    
+    #Get user biometric data
+    biometric_data = get_user_biometric_data(userId)
+    
+    if biometric_data:
+        biometric_info = (
+            f"User's Biometric Data:\n"
+            f"- Name: {biometric_data.get('name', 'N/A')} \n"
+            f"- Age: {biometric_data.get('age', 'N/A')} years\n"
+            f"- Weight: {biometric_data.get('weight', 'N/A')} lbs\n"
+            f"- Heart Rate: {biometric_data.get('heart_rate', 'N/A')} bpm\n"
+            f"- Steps: {biometric_data.get('steps', 'N/A')}\n"
+            f"- Calories Burned: {biometric_data.get('calories_burned', 'N/A')} kcal\n"
+            f"- Last Updated: {biometric_data.get('last_updated', 'N/A')}\n"
+        )
+    else:
+        biometric_info = "No biometric data available for this user.\n"
 
     prompt = (
         f"{custom_prompt}\n"
         f"{context_info}\n"
+        f"{biometric_info}\n"
         f"Previous Conversation:\n{conversation_history}\n"
         f"User Query: {query}\nAI:"
     )
