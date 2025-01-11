@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:rag_flutter_app/pages/voice_chat_screen.dart';
 import 'pages/introduction_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
