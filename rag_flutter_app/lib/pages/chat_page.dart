@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/api_service.dart';
 import 'voice_chat_screen.dart';
 
@@ -12,8 +13,43 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:5000');
-
   final List<Map<String, String>> _messages = [];
+
+  // User data variables
+  String _heartRate = '';
+  String _steps = '';
+  String _weight = '';
+
+  // Fetch biometric data from Firestore
+  Future<void> _getBiometricData() async {
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc('user001')
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          _heartRate = userDoc.data()?['heart_rate']?.toString() ?? 'N/A';
+          _steps = userDoc.data()?['steps']?.toString() ?? 'N/A';
+          _weight = userDoc.data()?['weight']?.toString() ?? 'N/A';
+        });
+      } else {
+        setState(() {
+          _heartRate = 'N/A';
+          _steps = 'N/A';
+          _weight = 'N/A';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _heartRate = 'Error';
+        _steps = 'Error';
+        _weight = 'Error';
+      });
+      debugPrint('Error fetching biometric data: $e');
+    }
+  }
 
   Future<void> _sendMessage() async {
     final query = _controller.text;
@@ -39,11 +75,54 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Fetch the biometric data when the page loads
+    _getBiometricData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lifestyle Assistant'),
         automaticallyImplyLeading: false,
+        centerTitle: true,  
+        title: _heartRate.isNotEmpty
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.favorite, color: Colors.red, size: 20),
+                  const SizedBox(width: 5),
+                  Text(
+                    _heartRate,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(width: 50),
+                  Icon(Icons.directions_walk, color: Colors.blue, size: 20),
+                  const SizedBox(width: 5),
+                  Text(
+                    _steps,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(width: 50),
+                  Icon(Icons.scale, color: Colors.green, size: 20),
+                  const SizedBox(width: 5),
+                  Text(
+                    '$_weight lbs',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              )
+            : const CircularProgressIndicator(),
       ),
       body: Column(
         children: [
@@ -81,6 +160,7 @@ class _ChatPageState extends State<ChatPage> {
                         color: isUser ? Colors.white : Colors.black,
                         fontSize: 16,
                       ),
+                      softWrap: true,
                     ),
                   ),
                 );
@@ -94,8 +174,8 @@ class _ChatPageState extends State<ChatPage> {
                 IconButton(
                   icon: Image.asset(
                     'assets/voice_chat.png',
-                    width: 30, // Adjust the width to fit your design
-                    height: 30, // Adjust the height to fit your design
+                    width: 30,
+                    height: 30,
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -104,7 +184,7 @@ class _ChatPageState extends State<ChatPage> {
                     );
                   },
                 ),
-                const SizedBox(width: 8), // Add more spacing before text field
+                const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
                     controller: _controller,
@@ -118,10 +198,10 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 20), // Add more spacing before send button
+                const SizedBox(width: 20),
                 CircleAvatar(
                   backgroundColor: const Color(0xFF008080),
-                  radius: 24, // Optional: Adjust size of the send button for prominence
+                  radius: 24,
                   child: IconButton(
                     icon: const Icon(Icons.arrow_upward, color: Colors.white),
                     onPressed: _sendMessage,

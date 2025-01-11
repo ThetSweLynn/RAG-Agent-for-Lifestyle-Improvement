@@ -17,6 +17,8 @@ dependencies:
   cupertino_icons: ^1.0.8    # iOS-styled icons
   flutter_sound: ^9.2.13     # Audio recording and playback
   permission_handler: ^10.4.5 # For managing app permissions
+  firebase_core: ^3.10.0
+  cloud_firestore: ^5.6.1
 
 dev_dependencies:
   flutter_test:

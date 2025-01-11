@@ -189,7 +189,7 @@ def call_rag_agent(query, userId="user001"):  #Change userId to the actual user 
     response = qa_chain.invoke(prompt)
 
     # Exclude sources from the response
-    final_response = wrap_text_preserve_newlines(response['result'])
+    final_response = response['result'].rstrip('\n') #wrap_text_preserve_newlines(response['result'])
     memory.append_to_history(query, final_response)
 
     return final_response
