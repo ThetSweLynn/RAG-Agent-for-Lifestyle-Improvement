@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'chat_page.dart';
+import 'login_page.dart';
 
 class IntroductionPage extends StatelessWidget {
   const IntroductionPage({super.key});
@@ -37,7 +37,7 @@ class IntroductionPage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ChatPage()),
+                  MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
               style: ElevatedButton.styleFrom(
