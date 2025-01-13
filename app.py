@@ -8,14 +8,15 @@ app = Flask(__name__)
 def query_rag():
     data = request.get_json()  # Get the JSON data from the request
     user_query = data.get('query', '')  # Extract the query
+    user_id = data.get('user_id', '')  # Extract the user ID
     
-    if not user_query:
-        return jsonify({"error": "Query is required"}), 400
+    if not user_query or not user_id:
+        return jsonify({"error": "Query and user_id are required"}), 400
     
-    # Call RAG agent
-    response = call_rag_agent(user_query)
+    # Call RAG agent with the user ID
+    response = call_rag_agent(user_query, user_id)
     
-    return jsonify({"response": response}),200
+    return jsonify({"response": response}), 200
 
 # Define route for speech input (audio query)
 @app.route('/audio_query', methods=['POST'])

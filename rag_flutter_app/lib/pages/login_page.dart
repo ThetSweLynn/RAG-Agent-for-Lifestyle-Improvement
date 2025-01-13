@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-
+      
       // Navigate to ChatPage if login is successful
       Navigator.pushReplacement(
         context,
@@ -49,9 +49,12 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text,
       );
 
+      // A custom logic to set username based on email
+      String name = _emailController.text.trim().split('@')[0]; // Get the part before '@'
+
       // After registration, create the user data in Firestore with the `uid` as the document ID
       FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
-        'name': 'Lynn', // You can set more fields here
+        'name': name, 
         'age': 22,
         'calories_burned': 467,
         'heart_rate': 92,
