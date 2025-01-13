@@ -164,15 +164,19 @@ class _ChatPageState extends State<ChatPage> {
           itemBuilder: (BuildContext context) {
             return {'Profile', 'Settings', 'Logout'}.map((String choice) {
               IconData icon;
+              Color iconColor = const Color(0xFF008080);
               switch (choice) {
                 case 'Profile':
                   icon = Icons.account_circle;
+                  iconColor = iconColor;
                   break;
                 case 'Settings':
                   icon = Icons.settings;
+                  iconColor = iconColor;
                   break;
                 case 'Logout':
                   icon = Icons.exit_to_app;
+                  iconColor = Colors.red;
                   break;
                 default:
                   icon = Icons.help;
@@ -192,15 +196,15 @@ class _ChatPageState extends State<ChatPage> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.3), // Shadow color
                             blurRadius: 10.0, // Blurry effect
-                            spreadRadius: 3.0, // Spread of the shadow
+                            spreadRadius: 1.0, // Spread of the shadow
                             offset: Offset(3, 3), // Position of the shadow
                           ),
                         ],
                       ),
                       child: CircleAvatar(
-                        backgroundColor: const Color(0xFF4F4F4F), // Set a color if needed
+                        backgroundColor: Colors.grey[200], // Set a color if needed
                         radius: 20,
-                        child: Icon(icon, color: Colors.white),
+                        child: Icon(icon, color: iconColor),
                       ),
                     ),
                   ],
