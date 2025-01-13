@@ -136,73 +136,84 @@ class _ChatPageState extends State<ChatPage> {
           ],
         ),
        actions: [
-  PopupMenuButton<String>(
-    icon: const Icon(Icons.more_vert), // Vertical three dots icon
-    onSelected: (value) {
-      switch (value) {
-        case 'Profile':
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ProfilePage()),
-          );
-          break;
-        case 'Settings':
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SettingsPage()),
-          );
-          break;
-        case 'Logout':
-          FirebaseAuth.instance.signOut();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
-          );
-          break;
-      }
-    },
-    itemBuilder: (BuildContext context) {
-      return {'Profile', 'Settings', 'Logout'}.map((String choice) {
-        IconData icon;
-        switch (choice) {
-          case 'Profile':
-            icon = Icons.account_circle;
-            break;
-          case 'Settings':
-            icon = Icons.settings;
-            break;
-          case 'Logout':
-            icon = Icons.exit_to_app;
-            break;
-          default:
-            icon = Icons.help;
-        }
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert), // Vertical three dots icon
+          onSelected: (value) {
+            switch (value) {
+              case 'Profile':
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+                break;
+              case 'Settings':
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                );
+                break;
+              case 'Logout':
+                FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+                break;
+            }
+          },
+          itemBuilder: (BuildContext context) {
+            return {'Profile', 'Settings', 'Logout'}.map((String choice) {
+              IconData icon;
+              switch (choice) {
+                case 'Profile':
+                  icon = Icons.account_circle;
+                  break;
+                case 'Settings':
+                  icon = Icons.settings;
+                  break;
+                case 'Logout':
+                  icon = Icons.exit_to_app;
+                  break;
+                default:
+                  icon = Icons.help;
+              }
 
-        return PopupMenuItem<String>(
-          value: choice,
-          padding: EdgeInsets.zero, // Remove any padding to prevent spacing
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              CircleAvatar(
-                backgroundColor: Color(0xFF4F4F4F), // Set a color if needed
-                radius: 20,
-                child: Icon(icon, color: Colors.white),
-              ),
-            ],
-          ),
-        );
-      }).toList();
-    },
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10.0), // Rounded corners if you want
-    ),
-    color: Colors.transparent, // Make the background of the popup transparent
-    elevation: 0, // Remove the shadow effect of the menu
-    offset: Offset(30, 30),
-  ),
-],
-),
+              return PopupMenuItem<String>(
+                value: choice,
+                padding: EdgeInsets.zero, // Remove any padding to prevent spacing
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Wrapping CircleAvatar with a Container for the shadow effect
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3), // Shadow color
+                            blurRadius: 10.0, // Blurry effect
+                            spreadRadius: 3.0, // Spread of the shadow
+                            offset: Offset(3, 3), // Position of the shadow
+                          ),
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: const Color(0xFF4F4F4F), // Set a color if needed
+                        radius: 20,
+                        child: Icon(icon, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList();
+          },
+          color: Colors.transparent, // Make the background of the popup transparent
+          elevation: 0, // Remove the shadow effect of the menu
+          offset: const Offset(30, 30),
+        ),
+      ],
+      ),
       body: Column(
         children: [
           Expanded(
