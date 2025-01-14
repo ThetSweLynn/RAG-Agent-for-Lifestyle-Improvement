@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rag_flutter_app/pages/chat_page.dart';
 import 'pages/introduction_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.teal,
       ),
-      home: IntroductionPage(),
+      home: ChatPage()//IntroductionPage(),
     );
   }
 }
