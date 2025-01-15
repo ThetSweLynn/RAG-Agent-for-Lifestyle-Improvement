@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "937312548700",
+    "project_id": "rag-for-lifestyle",
+    "storage_bucket": "rag-for-lifestyle.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:937312548700:android:d58cabc0810a292876f399",
+        "android_client_info": {
+          "package_name": "com.example.rag_flutter_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "937312548700-11dco6cri7ukck231grjcu5hrfravl5s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQMC3gVNTUKZ9jOg9RXjZq-B3Bp-FFowM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "937312548700-11dco6cri7ukck231grjcu5hrfravl5s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "937312548700-271q056ed8o2phamij0k4erjklqmhu5i.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cflbugs.ragFlutterApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
