@@ -4,7 +4,9 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:rag_flutter_app/services/api_service.dart';
 
 class VoiceChatScreen extends StatefulWidget {
-  const VoiceChatScreen({super.key});
+  final Function(Map<String, String>)? onNewMessage; // Callback for new messages
+
+  const VoiceChatScreen({super.key, this.onNewMessage});
 
   @override
   _VoiceChatScreenState createState() => _VoiceChatScreenState();
@@ -19,6 +21,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
   String _transcription = "";
   String _response = "";
   String _displayText = "Tap the mic to start speaking...";
+  final List<Map<String, String>> _conversation = []; // Store the conversation
 
   @override
   void initState() {
@@ -36,7 +39,6 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
     super.dispose();
   }
 
-  // Initialize Speech-to-Text
   Future<void> _initializeSpeech() async {
     bool available = await _speechToText.initialize();
     if (!available) {
@@ -46,7 +48,6 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
     }
   }
 
-  // Start listening to user speech
   void _startListening() async {
     if (!_isListening) {
       setState(() {
@@ -63,7 +64,6 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
     }
   }
 
-  // Stop listening and process the speech text
   void _stopListening() async {
     if (_isListening) {
       await _speechToText.stop();
@@ -71,8 +71,8 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
         _isListening = false;
       });
 
-      // Send transcription to API and display response
       if (_transcription.isNotEmpty) {
+        _addToConversation("user", _transcription); // Add user message
         _getResponseFromApi(_transcription);
       } else {
         setState(() {
@@ -82,7 +82,6 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
     }
   }
 
-  // Send query to the API and process the response
   Future<void> _getResponseFromApi(String query) async {
     setState(() {
       _displayText = "Processing...";
@@ -95,7 +94,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
         _displayText = _response; // Display API response
       });
 
-      // Speak the API response
+      _addToConversation("bot", apiResponse); // Add bot response
       await _speak(apiResponse);
     } catch (e) {
       setState(() {
@@ -104,15 +103,28 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
     }
   }
 
-  // Use Text-to-Speech to speak the response
   Future<void> _speak(String text) async {
     await _flutterTts.speak(text);
+  }
+
+  void _addToConversation(String sender, String text) {
+    final message = {"sender": sender, "text": text};
+    _conversation.add(message);
+    widget.onNewMessage?.call(message); // Notify ChatPage
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Voice Chat")),
+      appBar: AppBar(
+        title: const Text("Voice Chat"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context, _conversation); // Return conversation
+          },
+        ),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -121,7 +133,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
             children: [
               Container(
                 width: MediaQuery.of(context).size.width * 0.85,
-                height: 350, // Fixed height
+                height: 350,
                 padding: const EdgeInsets.all(25.0),
                 margin: const EdgeInsets.only(bottom: 16.0),
                 decoration: BoxDecoration(

@@ -227,6 +227,7 @@ class _ChatPageState extends State<ChatPage> {
               itemBuilder: (context, index) {
                 final message = _messages[index];
                 final isUser = message["sender"] == "user";
+                final isVoiceChat = message["source"] == "voice_chat";
 
                 return Align(
                   alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -248,13 +249,24 @@ class _ChatPageState extends State<ChatPage> {
                             isUser ? const Radius.circular(0) : const Radius.circular(16),
                       ),
                     ),
-                    child: Text(
-                      message["text"] ?? "",
-                      style: TextStyle(
-                        color: isUser ? Colors.white : Colors.black,
-                        fontSize: 16,
-                      ),
-                      softWrap: true,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          message["text"] ?? "",
+                          style: TextStyle(
+                            color: isUser ? Colors.white : Colors.black,
+                            fontSize: 16,
+                            fontStyle: isVoiceChat ? FontStyle.italic : FontStyle.normal,
+                          ),
+                          softWrap: true,
+                        ),
+                        if (isVoiceChat)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0, top: 4.0),
+                            child: Icon(Icons.mic, size: 16, color: isUser ? Colors.white : Colors.black),
+                          ),
+                      ],
                     ),
                   ),
                 );
@@ -271,10 +283,19 @@ class _ChatPageState extends State<ChatPage> {
                     width: 30,
                     height: 30,
                   ),
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    // Navigate to VoiceChatScreen and get any new messages
+                    await Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => VoiceChatScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => VoiceChatScreen(
+                          onNewMessage: (message) {
+                            setState(() {
+                              _messages.add({...message, "source": "voice_chat"});
+                            });
+                          },
+                        ),
+                      ),
                     );
                   },
                 ),
