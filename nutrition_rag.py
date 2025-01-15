@@ -131,7 +131,7 @@ def process_llm_response(llm_response):
 
 # RAG Agent Function
 # New Method: Answer Questions Without Sources
-def call_rag_agent(query, userId="user001"):  #Change userId to the actual user ID
+def call_rag_agent(query, userId):  
     
     #Get knowledge base
     try:

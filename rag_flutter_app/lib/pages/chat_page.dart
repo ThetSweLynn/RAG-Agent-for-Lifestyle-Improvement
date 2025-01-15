@@ -2,6 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/api_service.dart';
 import 'voice_chat_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_page.dart';
+
+// Dummy pages
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile')),
+      body: const Center(child: Text('Profile Page (Dummy)')),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Settings')),
+      body: const Center(child: Text('Settings Page (Dummy)')),
+    );
+  }
+}
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -23,9 +50,14 @@ class _ChatPageState extends State<ChatPage> {
   // Fetch biometric data from Firestore
   Future<void> _getBiometricData() async {
     try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        throw 'No user is logged in';
+      }
+
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc('user001')
+          .doc(currentUser.uid) // Use the logged-in user's UID
           .get();
 
       if (userDoc.exists) {
@@ -86,43 +118,105 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        centerTitle: true,  
-        title: _heartRate.isNotEmpty
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.favorite, color: Colors.red, size: 20),
-                  const SizedBox(width: 5),
-                  Text(
-                    _heartRate,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.black,
+        centerTitle: true,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.favorite, color: Colors.red, size: 20),
+            const SizedBox(width: 5),
+            Text(_heartRate, style: const TextStyle(fontSize: 12, color: Colors.black)),
+            const SizedBox(width: 50),
+            Icon(Icons.directions_walk, color: Colors.blue, size: 20),
+            const SizedBox(width: 5),
+            Text(_steps, style: const TextStyle(fontSize: 12, color: Colors.black)),
+            const SizedBox(width: 50),
+            Icon(Icons.scale, color: Colors.green, size: 20),
+            const SizedBox(width: 5),
+            Text('$_weight lbs', style: const TextStyle(fontSize: 12, color: Colors.black)),
+          ],
+        ),
+       actions: [
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert), // Vertical three dots icon
+          onSelected: (value) {
+            switch (value) {
+              case 'Profile':
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+                break;
+              case 'Settings':
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                );
+                break;
+              case 'Logout':
+                FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+                break;
+            }
+          },
+          itemBuilder: (BuildContext context) {
+            return {'Profile', 'Settings', 'Logout'}.map((String choice) {
+              IconData icon;
+              Color iconColor = const Color(0xFF008080);
+              switch (choice) {
+                case 'Profile':
+                  icon = Icons.account_circle;
+                  iconColor = iconColor;
+                  break;
+                case 'Settings':
+                  icon = Icons.settings;
+                  iconColor = iconColor;
+                  break;
+                case 'Logout':
+                  icon = Icons.exit_to_app;
+                  iconColor = Colors.red;
+                  break;
+                default:
+                  icon = Icons.help;
+              }
+
+              return PopupMenuItem<String>(
+                value: choice,
+                padding: EdgeInsets.zero, // Remove any padding to prevent spacing
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Wrapping CircleAvatar with a Container for the shadow effect
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3), // Shadow color
+                            blurRadius: 10.0, // Blurry effect
+                            spreadRadius: 1.0, // Spread of the shadow
+                            offset: Offset(3, 3), // Position of the shadow
+                          ),
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey[200], // Set a color if needed
+                        radius: 20,
+                        child: Icon(icon, color: iconColor),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 50),
-                  Icon(Icons.directions_walk, color: Colors.blue, size: 20),
-                  const SizedBox(width: 5),
-                  Text(
-                    _steps,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(width: 50),
-                  Icon(Icons.scale, color: Colors.green, size: 20),
-                  const SizedBox(width: 5),
-                  Text(
-                    '$_weight lbs',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              )
-            : const CircularProgressIndicator(),
+                  ],
+                ),
+              );
+            }).toList();
+          },
+          color: Colors.transparent, // Make the background of the popup transparent
+          elevation: 0, // Remove the shadow effect of the menu
+          offset: const Offset(30, 30),
+        ),
+      ],
       ),
       body: Column(
         children: [
