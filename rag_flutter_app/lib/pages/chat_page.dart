@@ -39,7 +39,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
-  final ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:5000');
+  final ApiService apiService = ApiService(baseUrl: 'http://10.0.2.2:5000'); // Android : 10.0.2.2 <-> IOS : 127.0.0.1
   final List<Map<String, String>> _messages = [];
 
   // User data variables
