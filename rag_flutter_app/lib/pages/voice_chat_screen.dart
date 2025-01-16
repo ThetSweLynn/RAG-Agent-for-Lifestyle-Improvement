@@ -28,7 +28,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> {
     super.initState();
     _speechToText = stt.SpeechToText();
     _flutterTts = FlutterTts();
-    _apiService = ApiService(baseUrl: 'http://127.0.0.1:5000');
+    _apiService = ApiService(baseUrl: 'http://10.0.2.2:5000'); // Android : 10.0.2.2 <-> IOS : 127.0.0.1
     _initializeSpeech();
   }
 
