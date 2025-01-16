@@ -9,3 +9,10 @@ ___
 
 > Voice chat not available yet in the flutter app
 > You can test the voice chat in the nutrition_rag.py file from "ECTI-DAMT-and-NCON-2025" branch
+
+___
+
+* You have to change the baseUrl of apiService according to the simulator type:
+> IOS Simulator : 'http://127.0.0.1:5000'
+> 
+> Android Simulator : 'http://10.0.2.2:5000'
