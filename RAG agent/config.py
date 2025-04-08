@@ -25,8 +25,3 @@ else:
 
 firebase_admin.initialize_app(cred)
 db = firestore.client()
-
-# ---------------------- Constants ----------------------
-PERSIST_DIRECTORY = 'db'
-BATCH_SIZE = 5000
-JSON_FILE_PATH = "Nutrition Data/usda_food_data.json"
