@@ -1,31 +1,19 @@
-# --- Server (for FastAPI) ---
 gunicorn==23.0.0
 flask==2.0.1
 werkzeug==2.3.7
-
-# --- Google Generative AI ---
 google-generativeai==0.8.4
 google-ai-generativelanguage==0.6.15
 google-auth==2.38.0
 torch==2.6.0
 transformers==4.49.0
-
-# --- Firebase (Firestore) ---
 firebase-admin==6.7.0
-
-# --- LangChain & Chroma ---
 langchain==0.3.23
 langchain-core==0.3.51
-langchain-chroma==0.2.2
 langchain-community==0.3.21
 langchain-google-genai==2.0.10
-langchain-text-splitters==0.3.8
-
-# --- Supporting Libraries ---
 pydantic==2.11.2
 python-dotenv==1.0.1
 requests==2.32.3
 urllib3==2.3.0
 certifi==2025.1.31
 protobuf==5.28.2
-tqdm==4.67.1
