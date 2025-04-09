@@ -3,9 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ApiService {
-  final String baseUrl;
-
-  ApiService({required this.baseUrl});
+  static const String baseUrl = "https://rag-agent-for-lifestyle-improvement.onrender.com";
 
   Future<String> getResponseFromApi(String query, String isWeekly, {String? startDate}) async {
     final response = await http.post(

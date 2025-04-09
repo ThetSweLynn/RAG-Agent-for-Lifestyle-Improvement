@@ -31,7 +31,7 @@ class _VoiceChatScreenState extends State<VoiceChatScreen> with SingleTickerProv
     super.initState();
     _speechToText = stt.SpeechToText();
     _flutterTts = FlutterTts();
-    _apiService = ApiService(baseUrl: 'http://127.0.0.1:5000');
+    _apiService = ApiService();
 
     _animationController = AnimationController(
       vsync: this,

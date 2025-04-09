@@ -19,7 +19,7 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
   String username = '';
   String workoutLevel = ''; // Store the workout level
   Map<String, bool> _completedExercises = {};
-  ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:5000');
+  ApiService apiService = ApiService();
   bool isGenerating = false;
 
   @override

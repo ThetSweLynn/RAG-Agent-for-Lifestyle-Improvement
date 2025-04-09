@@ -14,7 +14,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _controller = TextEditingController();
-  final ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:5000');
+  final ApiService apiService = ApiService();
   final List<Map<String, dynamic>> _pendingMessages = [];
   final ScrollController _scrollController = ScrollController();
   late CollectionReference _chatHistoryCollection;

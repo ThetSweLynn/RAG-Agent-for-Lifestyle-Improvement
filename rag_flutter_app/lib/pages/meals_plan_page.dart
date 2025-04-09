@@ -21,7 +21,7 @@ class _MealsPlanPageState extends State<MealsPlanPage> {
   int caloriesConsumed = 0;
   Map<String, bool> _completedMeals = {};
   bool isGenerating = false;
-  ApiService apiService = ApiService(baseUrl: 'http://127.0.0.1:5000');
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
