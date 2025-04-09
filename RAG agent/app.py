@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from qa_agent import call_rag_agent
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
@@ -35,4 +36,5 @@ def query_rag():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=True)
