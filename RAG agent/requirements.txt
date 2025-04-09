@@ -4,8 +4,6 @@ werkzeug==2.3.7
 google-generativeai==0.8.4
 google-ai-generativelanguage==0.6.15
 google-auth==2.38.0
-torch==2.6.0
-transformers==4.49.0
 firebase-admin==6.7.0
 langchain==0.3.23
 langchain-core==0.3.51

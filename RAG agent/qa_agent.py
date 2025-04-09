@@ -4,7 +4,6 @@ from plan_generation import generate_and_save_meal_plan, generate_and_save_worko
 from llm_setup import llm
 from config import *
 import logging
-from transformers import pipeline
 
 # Configure logging to show DEBUG and higher-level messages
 logging.basicConfig(
@@ -14,9 +13,6 @@ logging.basicConfig(
         logging.StreamHandler()  # Outputs to console
     ]
 )
-
-# Initialize the intent classification pipeline
-intent_classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
 
 SYSTEM_PROMPT = """You are a knowledgeable AI assistant specializing in nutrition, fitness, and general health. 
 Your primary tasks are:
@@ -68,8 +64,17 @@ def generate_nutrient_targets(biometric_data):
 
 def classify_intent(query):
     candidate_labels = ["generate meal plan", "generate workout plan", "general question"]
-    result = intent_classifier(query, candidate_labels)
-    return result['labels'][0]
+    
+    # Use Gemini to classify intent
+    try:
+        prompt = f"Classify the following user query into one of the categories: {', '.join(candidate_labels)}. Query: {query} /n ! ONLY RETURN THE LABEL!"
+        response = llm.invoke(prompt).content
+        
+        # Assuming the response is just the label, directly return it
+        return response.strip()
+    except Exception as e:
+        logging.error(f"Error during intent classification: {e}")
+        return "general question"  # Default to general question in case of error
 
 def call_rag_agent(query, userId, isWeekly, start_date=None):
     intent = classify_intent(query)
