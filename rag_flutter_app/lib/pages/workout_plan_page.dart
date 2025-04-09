@@ -678,6 +678,7 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
                   },
                 ),
               ),
+              const SizedBox(height: 100),
             ],
           ),
         );
