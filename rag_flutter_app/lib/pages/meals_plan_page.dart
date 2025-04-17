@@ -161,6 +161,7 @@ class _MealsPlanPageState extends State<MealsPlanPage> {
   Widget buildCalendar(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
+    
     // Calculate the first and last day of the current month
     DateTime now = DateTime.now();
     DateTime firstDayOfCurrentMonth = DateTime(now.year, now.month, 1);
@@ -173,20 +174,28 @@ class _MealsPlanPageState extends State<MealsPlanPage> {
     // Calculate the total number of days to display
     int totalDays = lastDayOfCurrentMonth.day + lastDayOfNextMonth.day;
 
-    // Calculate the index of the selected date
-    int todayIndex = selectedDate.isBefore(firstDayOfNextMonth)
-        ? selectedDate.day - 1
-        : lastDayOfCurrentMonth.day + selectedDate.day - 1;
+    // Calculate the index of today's date
+    int todayIndex = now.isBefore(firstDayOfNextMonth)
+        ? now.day - 1
+        : lastDayOfCurrentMonth.day + now.day - 1;
+
+    // Calculate the initial scroll offset to center today's date
+    double itemWidth = screenWidth * 0.15;
+    double marginHorizontal = screenWidth * 0.01;
+    double totalItemWidth = itemWidth + 2 * marginHorizontal; // 0.17 * screenWidth
+    double centerPosition = todayIndex * totalItemWidth + marginHorizontal + itemWidth / 2;
+    double initialOffset = centerPosition - screenWidth / 2;
+    if (initialOffset < 0) initialOffset = 0; // Ensure offset is non-negative
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06), // 8% of screen width
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: SizedBox(
-        height: screenHeight * 0.11, // 12% of screen height
+        height: screenHeight * 0.11,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: totalDays,
           controller: ScrollController(
-            initialScrollOffset: (todayIndex * screenWidth * 0.12) - screenWidth / 2 + screenWidth * 0.06,
+            initialScrollOffset: initialOffset,
           ),
           itemBuilder: (context, index) {
             DateTime date;
@@ -202,21 +211,21 @@ class _MealsPlanPageState extends State<MealsPlanPage> {
             return GestureDetector(
               onTap: () => onDateSelected(date),
               child: Container(
-                width: screenWidth * 0.15, // 15% of screen width
-                height: screenHeight * 0.1, // 12% of screen height
-                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01), // 1% of screen width
+                width: screenWidth * 0.15,
+                height: screenHeight * 0.1,
+                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
                 decoration: BoxDecoration(
                   color: isSelected ? (isDarkMode.value ? Colors.white30 : Colors.white) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(screenWidth * 0.07), // 7% of screen width
+                  borderRadius: BorderRadius.circular(screenWidth * 0.07),
                 ),
                 alignment: Alignment.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      DateFormat.MMM().format(date), // Short month name
+                      DateFormat.MMM().format(date),
                       style: TextStyle(
-                        fontSize: screenWidth * 0.03, // 3% of screen width
+                        fontSize: screenWidth * 0.03,
                         color: isSelected
                             ? (isDarkMode.value ? Colors.tealAccent : Colors.teal)
                             : (isToday ? Colors.deepOrange[300] : (isDarkMode.value ? Colors.grey : Colors.black)),
@@ -225,7 +234,7 @@ class _MealsPlanPageState extends State<MealsPlanPage> {
                     Text(
                       "${date.day}",
                       style: TextStyle(
-                        fontSize: screenWidth * 0.04, // 4% of screen width
+                        fontSize: screenWidth * 0.04,
                         fontWeight: FontWeight.w600,
                         color: isSelected
                             ? (isDarkMode.value ? Colors.tealAccent : Colors.teal)
@@ -233,9 +242,9 @@ class _MealsPlanPageState extends State<MealsPlanPage> {
                       ),
                     ),
                     Text(
-                      DateFormat.E().format(date), // Short day name
+                      DateFormat.E().format(date),
                       style: TextStyle(
-                        fontSize: screenWidth * 0.03, // 3% of screen width
+                        fontSize: screenWidth * 0.03,
                         color: isSelected
                             ? (isDarkMode.value ? Colors.tealAccent : Colors.teal)
                             : (isToday ? Colors.deepOrange[300] : (isDarkMode.value ? Colors.grey : Colors.black)),
@@ -243,9 +252,9 @@ class _MealsPlanPageState extends State<MealsPlanPage> {
                     ),
                     if (isSelected)
                       Container(
-                        margin: EdgeInsets.only(top: screenHeight * 0.005), // 0.5% of screen height
-                        width: screenWidth * 0.015, // 1.5% of screen width
-                        height: screenHeight * 0.015, // 1.5% of screen width
+                        margin: EdgeInsets.only(top: screenHeight * 0.005),
+                        width: screenWidth * 0.015,
+                        height: screenHeight * 0.015,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.teal[200],
@@ -260,7 +269,7 @@ class _MealsPlanPageState extends State<MealsPlanPage> {
       ),
     );
   }
-
+  
   Future<void> _saveCaloriesConsumed() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {

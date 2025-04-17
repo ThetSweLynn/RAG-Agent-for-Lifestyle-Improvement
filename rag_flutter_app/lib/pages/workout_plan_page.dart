@@ -25,6 +25,7 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
   @override
   void initState() {
     super.initState();
+    selectedDate = DateTime.now();
     _fetchUserData(); // Fetch the username and workout level when the page loads
   }
 
@@ -161,7 +162,7 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
   Widget buildCalendar(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
-
+    
     // Calculate the first and last day of the current month
     DateTime now = DateTime.now();
     DateTime firstDayOfCurrentMonth = DateTime(now.year, now.month, 1);
@@ -174,20 +175,28 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
     // Calculate the total number of days to display
     int totalDays = lastDayOfCurrentMonth.day + lastDayOfNextMonth.day;
 
-    // Calculate the index of the selected date
-    int todayIndex = selectedDate.isBefore(firstDayOfNextMonth)
-        ? selectedDate.day - 1
-        : lastDayOfCurrentMonth.day + selectedDate.day - 1;
+    // Calculate the index of today's date
+    int todayIndex = now.isBefore(firstDayOfNextMonth)
+        ? now.day - 1
+        : lastDayOfCurrentMonth.day + now.day - 1;
+
+    // Calculate the initial scroll offset to center today's date
+    double itemWidth = screenWidth * 0.15;
+    double marginHorizontal = screenWidth * 0.01;
+    double totalItemWidth = itemWidth + 2 * marginHorizontal; // 0.17 * screenWidth
+    double centerPosition = todayIndex * totalItemWidth + marginHorizontal + itemWidth / 2;
+    double initialOffset = centerPosition - screenWidth / 2;
+    if (initialOffset < 0) initialOffset = 0; // Ensure offset is non-negative
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06), // 6% of screen width
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: SizedBox(
-        height: screenHeight * 0.11, // 11% of screen height
+        height: screenHeight * 0.11,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: totalDays,
           controller: ScrollController(
-            initialScrollOffset: (todayIndex * screenWidth * 0.12) - screenWidth / 2 + screenWidth * 0.06,
+            initialScrollOffset: initialOffset,
           ),
           itemBuilder: (context, index) {
             DateTime date;
@@ -203,21 +212,21 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
             return GestureDetector(
               onTap: () => onDateSelected(date),
               child: Container(
-                width: screenWidth * 0.15, // 14% of screen width
-                height: screenHeight * 0.1, // 10% of screen height
-                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01), // 1% of screen width
+                width: screenWidth * 0.15,
+                height: screenHeight * 0.1,
+                margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
                 decoration: BoxDecoration(
                   color: isSelected ? (isDarkMode.value ? Colors.white30 : Colors.white) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(screenWidth * 0.07), // 7% of screen width
+                  borderRadius: BorderRadius.circular(screenWidth * 0.07),
                 ),
                 alignment: Alignment.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      DateFormat.MMM().format(date), // Short month name
+                      DateFormat.MMM().format(date),
                       style: TextStyle(
-                        fontSize: screenWidth * 0.03, // 3% of screen width
+                        fontSize: screenWidth * 0.03,
                         color: isSelected
                             ? (isDarkMode.value ? Colors.tealAccent : Colors.teal)
                             : (isToday ? Colors.deepOrange[300] : (isDarkMode.value ? Colors.grey : Colors.black)),
@@ -226,7 +235,7 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
                     Text(
                       "${date.day}",
                       style: TextStyle(
-                        fontSize: screenWidth * 0.04, // 4% of screen width
+                        fontSize: screenWidth * 0.04,
                         fontWeight: FontWeight.w600,
                         color: isSelected
                             ? (isDarkMode.value ? Colors.tealAccent : Colors.teal)
@@ -234,9 +243,9 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
                       ),
                     ),
                     Text(
-                      DateFormat.E().format(date), // Short day name
+                      DateFormat.E().format(date),
                       style: TextStyle(
-                        fontSize: screenWidth * 0.03, // 3% of screen width
+                        fontSize: screenWidth * 0.03,
                         color: isSelected
                             ? (isDarkMode.value ? Colors.tealAccent : Colors.teal)
                             : (isToday ? Colors.deepOrange[300] : (isDarkMode.value ? Colors.grey : Colors.black)),
@@ -244,9 +253,9 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
                     ),
                     if (isSelected)
                       Container(
-                        margin: EdgeInsets.only(top: screenHeight * 0.005), // 0.5% of screen height
-                        width: screenWidth * 0.015, // 1.5% of screen width
-                        height: screenHeight * 0.015, // 1.5% of screen width
+                        margin: EdgeInsets.only(top: screenHeight * 0.005),
+                        width: screenWidth * 0.015,
+                        height: screenHeight * 0.015,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.teal[200],
@@ -261,7 +270,7 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
       ),
     );
   }
-
+  
   // Build the workout level sentence
   Widget buildWorkoutLevel() {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -645,40 +654,68 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
                 child: StreamBuilder<QuerySnapshot>(
                   stream: getWorkoutPlansForDate(selectedDate),
                   builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text("Error: ${snapshot.error}"));
-                    }
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              "No workout plans available for the selected date",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: darkMode ? Colors.white : Colors.black,
+                    if (snapshot.hasError || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      // Handle no workout plans found
+                      final now = DateTime.now();
+                      final isWithinOneWeek = selectedDate.isAfter(now) && selectedDate.difference(now).inDays <= 7;
+                      final isCurrentDay = selectedDate.day == now.day &&
+                          selectedDate.month == now.month &&
+                          selectedDate.year == now.year;
+                      
+                      if (isWithinOneWeek || isCurrentDay) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "No workout plans found",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: darkMode ? Colors.white : Colors.black,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
+                              const SizedBox(height: 10),
+                              buildWorkoutPlanGenerateButton("Generate a workout plan", "true"),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "No workout plans available for the selected date",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: darkMode ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     }
 
                     return ListView(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       children: snapshot.data!.docs.map((doc) {
-                        return buildWorkoutPlanCard(doc.data() as Map<String, dynamic>);
+                        return Column(
+                          children: [
+                            buildWorkoutPlanCard(doc.data() as Map<String, dynamic>),
+                            const SizedBox(height: 100),
+                          ],
+                        );
                       }).toList(),
                     );
                   },
                 ),
               ),
-              const SizedBox(height: 100),
             ],
           ),
         );
