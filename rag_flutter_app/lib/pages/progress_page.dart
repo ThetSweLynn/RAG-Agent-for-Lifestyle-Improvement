@@ -17,6 +17,9 @@ class ProgressPage extends StatefulWidget {
 }
 
 class _ProgressPageState extends State<ProgressPage> {
+  // Add ValueNotifiers to manage the visibility of the charts
+  final ValueNotifier<bool> _isCaloriesChartVisible = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _isExerciseChartVisible = ValueNotifier<bool>(false);
 
   //From Firestore database
   String _weight = '';
@@ -52,6 +55,14 @@ class _ProgressPageState extends State<ProgressPage> {
     // Configure the health service and fetch initial data
     health.configure();
     _getBiometricData();
+  }
+
+  @override
+  void dispose() {
+    // Dispose the ValueNotifiers to avoid memory leaks
+    _isCaloriesChartVisible.dispose();
+    _isExerciseChartVisible.dispose();
+    super.dispose();
   }
 
   Future<void> _getBiometricData() async {
@@ -314,7 +325,7 @@ class _ProgressPageState extends State<ProgressPage> {
               ),
             ],
           ),
-          SizedBox(height: 10.0),
+          SizedBox(height: 15.0),
           Row(
             children: [
               Icon(Icons.local_fire_department, color: Colors.red),
@@ -323,7 +334,7 @@ class _ProgressPageState extends State<ProgressPage> {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                        text: 'Calories burnt today: ',
+                        text: 'Calories Burnt Today: ',
                         style: TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.bold,
@@ -342,13 +353,38 @@ class _ProgressPageState extends State<ProgressPage> {
           SizedBox(height: 10.0),
           Row(
             children: [
+              Icon(Icons.local_fire_department, color: Colors.lightGreen),
+              SizedBox(width: 10.0),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                        text: 'Calories Consumed Today: ',
+                        style: TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode.value ? Colors.white : Colors.black)),
+                    TextSpan(
+                        text: '${_caloriesConsumedSpots.isNotEmpty ? _caloriesConsumedSpots.last.y.toStringAsFixed(0) : 'err'}  kcal',
+                        style: TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.normal,
+                            color: isDarkMode.value ? Colors.white70 : Colors.black)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.0),
+          Row(
+            children: [
               Icon(Icons.directions_walk, color: Colors.blue),
               SizedBox(width: 10.0),
               RichText(
                 text: TextSpan(
                   children: [
                     TextSpan(
-                        text: 'Total steps today: ',
+                        text: 'Total Steps Today: ',
                         style: TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.bold,
@@ -373,7 +409,7 @@ class _ProgressPageState extends State<ProgressPage> {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                        text: 'Current consistency streak: ',
+                        text: 'Current Consistency Streak: ',
                         style: TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.bold,
@@ -419,7 +455,7 @@ class _ProgressPageState extends State<ProgressPage> {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                        text: 'Most calories burnt: ',
+                        text: 'Most Calories Burnt: ',
                         style: TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.w600,
@@ -438,7 +474,7 @@ class _ProgressPageState extends State<ProgressPage> {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                        text: 'Highest streak: ',
+                        text: 'Highest Streak: ',
                         style: TextStyle(
                             fontSize: 13.0,
                             fontWeight: FontWeight.bold,
@@ -754,7 +790,7 @@ class _ProgressPageState extends State<ProgressPage> {
       ],
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     String todayDate = DateFormat('MMMM dd, yyyy').format(DateTime.now());
@@ -789,6 +825,7 @@ class _ProgressPageState extends State<ProgressPage> {
           body: RefreshIndicator(
             onRefresh: _getBiometricData,
             child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 5.0),
                 child: Column(
@@ -806,24 +843,41 @@ class _ProgressPageState extends State<ProgressPage> {
                         Text(
                           "Calories Overview",
                           style: TextStyle(
-                              fontSize: screenWidth * 0.03,
+                              fontSize: screenWidth * 0.035,
                               fontWeight: FontWeight.w600,
                               color: darkMode ? Colors.white : Colors.black),
                         ),
                         Spacer(),
                         IconButton(
-                          onPressed: _getBiometricData,
-                          icon: Icon(
-                            Icons.refresh_rounded,
-                            color: darkMode ? Colors.white70 : Colors.blue[200],
+                          onPressed: () {
+                            _isCaloriesChartVisible.value = !_isCaloriesChartVisible.value;
+                          },
+                          icon: ValueListenableBuilder<bool>(
+                            valueListenable: _isCaloriesChartVisible,
+                            builder: (context, isVisible, child) {
+                              return Icon(
+                                isVisible ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                                color: darkMode ? Colors.white70 : Colors.blue[200],
+                                size: screenWidth * 0.07,
+                              );
+                            },
                           ),
-                          tooltip: 'Refresh Data',
+                          tooltip: 'Toggle Chart Visibility',
                         ),
                       ],
                     ),
-                    SizedBox(height: 15.0),
-                    _buildCaloriesOverviewChart(),
-                    SizedBox(height: 25.0),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: _isCaloriesChartVisible,
+                      builder: (context, isVisible, child) {
+                        return isVisible ? Column(
+                          children: [
+                            SizedBox(height: 15.0),
+                            _buildCaloriesOverviewChart(),
+                          ],
+                        ) : SizedBox.shrink();
+                      },
+                    ),
+                    SizedBox(height: 20.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -831,23 +885,40 @@ class _ProgressPageState extends State<ProgressPage> {
                         Text(
                           "Exercise Completion Overview",
                           style: TextStyle(
-                              fontSize: screenWidth * 0.03,
+                              fontSize: screenWidth * 0.035,
                               fontWeight: FontWeight.w600,
                               color: darkMode ? Colors.white : Colors.black),
                         ),
                         Spacer(),
                         IconButton(
-                          onPressed: _getBiometricData,
-                          icon: Icon(
-                            Icons.refresh_rounded,
-                            color: darkMode ? Colors.white70 : Colors.blue[200],
+                          onPressed: () {
+                            _isExerciseChartVisible.value = !_isExerciseChartVisible.value;
+                          },
+                          icon: ValueListenableBuilder<bool>(
+                            valueListenable: _isExerciseChartVisible,
+                            builder: (context, isVisible, child) {
+                              return Icon(
+                                isVisible ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                                color: darkMode ? Colors.white70 : Colors.blue[200],
+                                size: screenWidth * 0.07,
+                              );
+                            },
                           ),
-                          tooltip: 'Refresh Data',
+                          tooltip: 'Toggle Chart Visibility',
                         ),
                       ],
                     ),
-                    SizedBox(height: 15.0),
-                    _buildExerciseCompletionChart(), // Add the new chart here
+                    ValueListenableBuilder<bool>(
+                      valueListenable: _isExerciseChartVisible,
+                      builder: (context, isVisible, child) {
+                        return isVisible ? Column(
+                          children: [
+                            SizedBox(height: 15.0),
+                            _buildExerciseCompletionChart(),
+                          ],
+                        ) : SizedBox.shrink();
+                      },
+                    ),
                     SizedBox(height: 100.0),
                   ],
                 ),
