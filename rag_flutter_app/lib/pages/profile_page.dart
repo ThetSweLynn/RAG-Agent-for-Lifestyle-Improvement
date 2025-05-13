@@ -70,6 +70,12 @@ class _ProfilePageState extends State<ProfilePage> {
         'last_updated': FieldValue.serverTimestamp(),
       });
 
+      await FirebaseFirestore.instance.collection('leaderboard').doc(user.uid).update({
+        'displayName': _nameController.text.trim(),
+        'photoURL' : _profileImageUrl,
+        'last_updated': FieldValue.serverTimestamp(),
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile Updated Successfully!')),
       );

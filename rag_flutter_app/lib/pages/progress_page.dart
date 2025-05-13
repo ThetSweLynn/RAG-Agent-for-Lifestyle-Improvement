@@ -8,6 +8,7 @@ import 'package:health/health.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import '/services/globals.dart';
+import '/pages/leaderboard_page.dart';
 
 class ProgressPage extends StatefulWidget {
   const ProgressPage({super.key});
@@ -500,6 +501,54 @@ class _ProgressPageState extends State<ProgressPage> {
     );
   }
 
+  Widget _buildLeaderboardButton() {
+    return SizedBox(
+      width: double.infinity, // Match the width of the userCurrentDataSection
+      child: InkWell(
+        onTap: () {
+          // Navigate to the LeaderboardPage
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LeaderboardPage()),
+          );
+        },
+        borderRadius: BorderRadius.circular(100.0), // Match the button's border radius
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 15.0), // Vertical padding
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFFFD700), Color(0xFFFF8C00)], // Gold to dark orange
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(100.0), // Rounded corners
+          ),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 13.0),
+                Text(
+                  'See how you rank',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white, // Text color
+                  ),
+                ),
+                SizedBox(width: 13.0),
+                Icon(
+                  Icons.line_axis_rounded,
+                  color: Colors.white, // Icon color
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildMotivationalQuoteSection() {
     String dailyQuote = getDailyQuote();
     return Container(
@@ -831,9 +880,11 @@ class _ProgressPageState extends State<ProgressPage> {
                 child: Column(
                   children: [
                     _buildUserCurrentDataSection(),
-                    SizedBox(height: 10.0),
+                    SizedBox(height: 13.0),
                     _buildAchievementSection(),
-                    SizedBox(height: 10.0),
+                    SizedBox(height: 13.0),
+                    _buildLeaderboardButton(),
+                    SizedBox(height: 13.0),
                     _buildMotivationalQuoteSection(),
                     SizedBox(height: 13.0),
                     Row(

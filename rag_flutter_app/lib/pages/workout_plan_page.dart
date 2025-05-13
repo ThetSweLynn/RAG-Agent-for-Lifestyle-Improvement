@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../widgets/settings_button.dart';
 import '/services/globals.dart';
 import '/services/api_service.dart';
+import '/services/leaderboard_service.dart';
 import 'dart:convert';
 
 class WorkoutPlanPage extends StatefulWidget {
@@ -575,6 +576,13 @@ class _WorkoutPlanPageState extends State<WorkoutPlanPage> {
             ? Timestamp.fromDate(newHighestStreakDate)
             : null,
       });
+      // Call leaderboard update
+      await LeaderboardService.updateLeaderboard(
+        userId: userId,
+        displayName: username,
+        photoURL: data['profileImage'],
+        highestStreak: newHighestStreak,
+      );
     } catch (e) {
       print('Error saving exercises: $e');
     }
