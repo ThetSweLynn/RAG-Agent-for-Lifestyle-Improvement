@@ -73,26 +73,48 @@ class _ProgressPageState extends State<ProgressPage> {
         throw 'No user is logged in';
       }
 
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUser.uid)
-          .get();
+      try {
+  final userDoc = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser.uid)
+      .get();
 
-      if (userDoc.exists) {
-        setState(() {
-          _weight = userDoc.data()?['weight']?.toString() ?? 'N/A';
-          _height = userDoc.data()?['height']?.toString() ?? 'N/A';
-          _consistencyStreak = userDoc.data()?['consistencyStreak'] ?? 0;
-          _highestStreak = userDoc.data()?['highestStreak'] ?? 0;
-        });
-      } else {
-        setState(() {
-          _weight = 'N/A';
-          _height = 'N/A';
-          _consistencyStreak = 0;
-          _highestStreak = 0;
-        });
-      }
+  if (userDoc.exists) {
+    final data = userDoc.data();
+    setState(() {
+      _weight = data?['weight']?.toString() ?? 'N/A';
+      _height = data?['height']?.toString() ?? 'N/A';
+      _consistencyStreak = data?['consistencyStreak'] ?? 0;
+      _highestStreak = data?['highestStreak'] ?? 0;
+    });
+
+    // Update leaderboard with latest highestStreak
+    await FirebaseFirestore.instance
+        .collection('leaderboard')
+        .doc(currentUser.uid)
+        .set({
+          'displayName': userDoc.data()?['name'] ?? currentUser.displayName ?? 'Unknown',
+          'highestStreak': _highestStreak,
+          'photoURL': userDoc.data()?['profileImage'],
+        }, SetOptions(merge: true));
+  } else {
+    setState(() {
+      _weight = 'N/A';
+      _height = 'N/A';
+      _consistencyStreak = 0;
+      _highestStreak = 0;
+    });
+  }
+} catch (e) {
+  print('Failed to fetch/update user data: $e');
+  setState(() {
+    _weight = 'N/A';
+    _height = 'N/A';
+    _consistencyStreak = 0;
+    _highestStreak = 0;
+  });
+}
+
 
       // Calculate the start date for the last 7 days
       final now = DateTime.now();
