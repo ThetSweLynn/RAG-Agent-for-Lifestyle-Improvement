@@ -95,7 +95,8 @@ class _ProgressPageState extends State<ProgressPage> {
         .set({
           'displayName': userDoc.data()?['name'] ?? currentUser.displayName ?? 'Unknown',
           'highestStreak': _highestStreak,
-          'photoURL': userDoc.data()?['profileImage'],
+          'consistencyStreak': _consistencyStreak,
+          'photoURL': userDoc.data()?['profileImage'], // <-- must match here!
         }, SetOptions(merge: true));
   } else {
     setState(() {
