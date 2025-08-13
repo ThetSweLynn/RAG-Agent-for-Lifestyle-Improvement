@@ -110,7 +110,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                           'consistencyStreak': null,
                         });
                       }
-
+  
                       return FutureBuilder<Map<String, dynamic>?>(
                         future: _findMyRankAndData(),
                         builder: (c, rs) {
